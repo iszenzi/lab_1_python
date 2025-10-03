@@ -1,4 +1,4 @@
-from src.constant import OPERATIONS
+from src.constants import OPERATIONS
 from src.exceptions import *
 
 def tokenize(string: str) -> list[(str, float | int | None)]: 
