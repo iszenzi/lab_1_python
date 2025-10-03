@@ -1,7 +1,7 @@
 from src.constant import OPERATIONS
 from src.exceptions import *
 
-def tokenize(string: str) -> list[(str, float | int | None)]:                       # не знаю как правильно записать ->
+def tokenize(string: str) -> list[(str, float | int | None)]: 
     """
     Разбивает строку на токены: числа и операторы
     Кладет полученные токены в список
@@ -12,12 +12,11 @@ def tokenize(string: str) -> list[(str, float | int | None)]:                   
     :return: Возвращает список токенов
     """
     tokens = []
-    parts = str(string).split()                      #мб и не нужно обрабатывать скобки
+    parts = str(string).split() 
     if not parts:
         raise EmptyStringError('Введена пустая строка')
     operations = OPERATIONS
-    for part in parts:                                           # пока что есть ошибки с *********** 2**2 и тп(но если написать else:raise то нет ошибок)
-        #try:
+    for part in parts:                                         
         #Добавление токена вещественного числа
         if part.count('.') == 1:
             part_float = part.split('.')
@@ -37,8 +36,6 @@ def tokenize(string: str) -> list[(str, float | int | None)]:                   
             tokens.append((f'{part}', None))
         else:
             raise UnknownTokenError(f'Неизвестный токен "{part}"')
-        #except:
-            #raise UnknownTokenError(f'Неизвестный токен "{part}"')
     return tokens
 
 

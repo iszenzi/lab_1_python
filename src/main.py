@@ -1,21 +1,21 @@
-from calculator import tokenize, calculate, CalcError
+from calculator import tokenize, calculate
 from constant import OPERATIONS
+from exceptions import *
 
 def main() -> float | int:
     """
     Читает RPN выражение, написанное пользователем, вычисляет результат выражения
-    ::                                      # return ничего не выводит, поэтому использую print что указывать в :: тогда
+    :return: результат RPN выражения
     """
     rpn_string = str(input('Введите RPN выражение:'))
-    #try:
     tokens = tokenize(string=rpn_string)
     result = calculate(string=rpn_string)
     return result
-    #except:
-       # raise CalcError('Непредвиденная ошибка')
+
+
     
 if __name__ == "__main__":
-    print(main())
+    print('Результат =', main())
 
 
 
