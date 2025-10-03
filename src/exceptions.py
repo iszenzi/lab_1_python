@@ -10,7 +10,7 @@ class UnknownTokenError(CalcError):
     """Ошибка неизвестного токена"""
     pass
 
-class IntegerNumberError(CalcError):
+class IntegerNumbersError(CalcError):
     """Ошибка - требуются целые числа для оператора"""
     pass
 

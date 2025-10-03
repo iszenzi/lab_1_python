@@ -17,28 +17,28 @@ def tokenize(string: str) -> list[(str, float | int | None)]:                   
         raise EmptyStringError('Введена пустая строка')
     operations = OPERATIONS
     for part in parts:                                           # пока что есть ошибки с *********** 2**2 и тп(но если написать else:raise то нет ошибок)
-        try:
-            #Добавление токена вещественного числа
-            if part.count('.') == 1:
-                part_float = part.split('.')
-                """
-                lstrip удалит все + или - слева, если + или - будет один,т.е. число является унарным, 
-                то оно сможет преобразоваться во float()/int(), но если знаков будет > чем 1,
-                то except выведет ошибку, так как float()/int() не преобразует число --5
-                """
-                if ''.join(part_float).lstrip('+-').isdigit():
-                    tokens.append(('NUMBER', float(part)))
-            #Добавление токена целого числа
-            elif part.lstrip('+-').isdigit():
-                
-                tokens.append(('NUMBER', int(part)))
-            #Добавление токена оператора 
-            elif part in operations:
-                tokens.append((f'{part}', None))
-            else:
-                raise UnknownTokenError(f'Неизвестный токен "{part}"')
-        except:
-            raise UnknownTokenError(f'Незивестный токен "{part}"')
+        #try:
+        #Добавление токена вещественного числа
+        if part.count('.') == 1:
+            part_float = part.split('.')
+            """
+            lstrip удалит все + или - слева, если + или - будет один,т.е. число является унарным, 
+            то оно сможет преобразоваться во float()/int(), но если знаков будет > чем 1,
+            то except выведет ошибку, так как float()/int() не преобразует число --5
+            """
+            if ''.join(part_float).lstrip('+-').isdigit():
+                tokens.append(('NUMBER', float(part)))
+        #Добавление токена целого числа
+        elif part.lstrip('+-').isdigit():
+            
+            tokens.append(('NUMBER', int(part)))
+        #Добавление токена оператора 
+        elif part in operations:
+            tokens.append((f'{part}', None))
+        else:
+            raise UnknownTokenError(f'Неизвестный токен "{part}"')
+        #except:
+            #raise UnknownTokenError(f'Неизвестный токен "{part}"')
     return tokens
 
 
@@ -67,7 +67,7 @@ def calculate(string: str) -> float | int:
             #Для операторов // и % числа должны быть целыми
             if token_type in ['//', '%']:
                 if (a % 1 == 0) + (b % 1 == 0) != 2:
-                    raise IntegerNumberError(f'Для операции "{token_type}" нужны целые числа')
+                    raise IntegerNumbersError(f'Для операции "{token_type}" нужны целые числа')
                 else:
                     stack.append(operations[token_type](a, b))
             if token_type in ['+', '-', '*', '**']:
@@ -76,6 +76,6 @@ def calculate(string: str) -> float | int:
             raise UnknownTokenError(f'Неизвестный токен "{token_type}"')
     #После обработки всех токенов в стеке должно остаться одно число
     if len(stack) != 1:
-        raise IncorrectExpressionError('Неправильное RPN выражение')
+        raise IncorrectExpressionError('Введено неправильное RPN выражение')
     return stack[0]
 
