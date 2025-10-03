@@ -34,3 +34,4 @@ def test_caluclate_non_integer_operations():
     assert calculate('7 3.1 *') == 21.7
     assert calculate('2 5 **') == 32
     assert calculate('5 -3 **') == 1 / 125
+

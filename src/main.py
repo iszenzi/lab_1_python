@@ -7,12 +7,12 @@ def main() -> float | int:
     ::                                      # return ничего не выводит, поэтому использую print что указывать в :: тогда
     """
     rpn_string = str(input('Введите RPN выражение:'))
-    try:
-        tokens = tokenize(string=rpn_string)
-        result = calculate(tokens=tokens)
-        return result
-    except:
-        raise CalcError('Непредвиденная ошибка')
+    #try:
+    tokens = tokenize(string=rpn_string)
+    result = calculate(string=rpn_string)
+    return result
+    #except:
+       # raise CalcError('Непредвиденная ошибка')
     
 if __name__ == "__main__":
     print(main())

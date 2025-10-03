@@ -1,9 +1,5 @@
 from src.constant import OPERATIONS
-
-
-class CalcError(Exception):
-    pass
-
+from src.exceptions import *
 
 def tokenize(string: str) -> list[(str, float | int | None)]:                       # не знаю как правильно записать ->
     """
@@ -16,9 +12,9 @@ def tokenize(string: str) -> list[(str, float | int | None)]:                   
     :return: Возвращает список токенов
     """
     tokens = []
-    parts = str(string).replace('(','').replace(')','').split()                      #мб и не нужно обрабатывать скобки
+    parts = str(string).split()                      #мб и не нужно обрабатывать скобки
     if not parts:
-        raise CalcError('Пустая строка')
+        raise EmptyStringError('Введена пустая строка')
     operations = OPERATIONS
     for part in parts:                                           # пока что есть ошибки с *********** 2**2 и тп(но если написать else:raise то нет ошибок)
         try:
@@ -39,21 +35,21 @@ def tokenize(string: str) -> list[(str, float | int | None)]:                   
             #Добавление токена оператора 
             elif part in operations:
                 tokens.append((f'{part}', None))
-                                                                                        ### ДОБАВИТЬ ТОКЕН E0F - А надо ли?
             else:
-                raise CalcError(f'Неизвестный токен "{part}"')
+                raise UnknownTokenError(f'Неизвестный токен "{part}"')
         except:
-            raise CalcError(f'Незивестный токен "{part}"')
+            raise UnknownTokenError(f'Незивестный токен "{part}"')
     return tokens
 
 
-def calculate(tokens: list[(str, float | int | None)]) -> float | int:
+def calculate(string: str) -> float | int:
     """
     Вычисляет значение RPN выражения
     :param string: RPN выражение, записанное пользователем
     :return: Возвращает результат вычисления RPN выражения 
     """
     stack = []
+    tokens = tokenize(string)
     operations = OPERATIONS
     for token_type, token_value in tokens:
         #Добавление числа в стек
@@ -62,24 +58,24 @@ def calculate(tokens: list[(str, float | int | None)]) -> float | int:
         #Проверка возможности выполнения операции
         elif token_type in operations:
             if len(stack) < 2:
-                raise CalcError(f'Недостаточно чисел для оператора "{token_type}"')
+                raise NotEnoughNumbersError(f'Недостаточно чисел для оператора "{token_type}"')
             b = stack.pop() #второе число
             a = stack.pop() #первое число
             #Проверка деления на 0
             if token_type in ['/', '//', '%'] and b == 0:
-                raise CalcError('Деление на ноль')
+                raise ZeroDivisionError('Деление на ноль')
             #Для операторов // и % числа должны быть целыми
             if token_type in ['//', '%']:
                 if (a % 1 == 0) + (b % 1 == 0) != 2:
-                    raise CalcError(f'Для операции "{token_type}" нужны целые числа')
+                    raise IntegerNumberError(f'Для операции "{token_type}" нужны целые числа')
                 else:
                     stack.append(operations[token_type](a, b))
             if token_type in ['+', '-', '*', '**']:
                 stack.append(operations[token_type](a, b))
         else:
-            raise CalcError(f'Неизвестный токен "{token_type}"')
+            raise UnknownTokenError(f'Неизвестный токен "{token_type}"')
     #После обработки всех токенов в стеке должно остаться одно число
     if len(stack) != 1:
-        raise CalcError('Неправильное RPN выражение')
+        raise IncorrectExpressionError('Неправильное RPN выражение')
     return stack[0]
 
