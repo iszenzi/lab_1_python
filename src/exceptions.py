@@ -21,3 +21,6 @@ class NotEnoughNumbersError(CalcError):
 class IncorrectExpressionError(CalcError):
     """Ошибка некорректного RPN выражения"""
     pass
+
+class InvalidTokenValueError(CalcError):
+    """Ошибка некорректного значения токена"""

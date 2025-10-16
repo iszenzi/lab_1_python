@@ -1,7 +1,13 @@
 from src.constants import OPERATIONS
-from src.exceptions import *
-
-def tokenize(string: str) -> list[(str, float | int | None)]: 
+from src.exceptions import (
+    UnknownTokenError,
+    EmptyStringError,
+    NotEnoughNumbersError,
+    IncorrectExpressionError,
+    IntegerNumbersError,
+    InvalidTokenValueError
+)
+def tokenize(string: str) -> list[tuple[str, float | int | None]]:
     """
     Разбивает строку на токены: числа и операторы
     Кладет полученные токены в список
@@ -11,17 +17,18 @@ def tokenize(string: str) -> list[(str, float | int | None)]:
     :param string: RPN выражение, записанное пользователем
     :return: Возвращает список токенов
     """
-    tokens = []
-    parts = str(string).split() 
+    tokens: list[tuple[str, float | int | None]] = []
+    parts = str(string).split()
     if not parts:
         raise EmptyStringError('Введена пустая строка')
     operations = OPERATIONS
-    for part in parts:                                         
+    for part in parts:
+
         #Добавление токена вещественного числа
         if part.count('.') == 1:
             part_float = part.split('.')
             """
-            lstrip удалит все + или - слева, если + или - будет один,т.е. число является унарным, 
+            lstrip удалит все + или - слева, если + или - будет один,т.е. число является унарным,
             то оно сможет преобразоваться во float()/int(), но если знаков будет > чем 1,
             то except выведет ошибку, так как float()/int() не преобразует число --5
             """
@@ -29,28 +36,30 @@ def tokenize(string: str) -> list[(str, float | int | None)]:
                 tokens.append(('NUMBER', float(part)))
         #Добавление токена целого числа
         elif part.lstrip('+-').isdigit():
-            
             tokens.append(('NUMBER', int(part)))
-        #Добавление токена оператора 
+        #Добавление токена оператора
         elif part in operations:
-            tokens.append((f'{part}', None))
+            tokens.append((part, None))
         else:
             raise UnknownTokenError(f'Неизвестный токен "{part}"')
     return tokens
 
+#def tokenize2(string: str) -> list[(str, float | int | None)]:
 
-def calculate(string: str) -> float | int:
+
+def calculate(tokens: list[tuple[str, float | int | None]]) -> float | int:
     """
     Вычисляет значение RPN выражения
-    :param string: RPN выражение, записанное пользователем
-    :return: Возвращает результат вычисления RPN выражения 
+    :param tokens: список токенов, полученных из tokenize()
+    :return: Возвращает результат вычисления RPN выражения
     """
-    stack = []
-    tokens = tokenize(string)
+    stack: list[float | int] = []
     operations = OPERATIONS
     for token_type, token_value in tokens:
         #Добавление числа в стек
         if token_type == 'NUMBER':
+            if token_value is None:
+                raise InvalidTokenValueError("Токен числа не может быть значения None")
             stack.append(token_value)
         #Проверка возможности выполнения операции
         elif token_type in operations:
@@ -75,4 +84,3 @@ def calculate(string: str) -> float | int:
     if len(stack) != 1:
         raise IncorrectExpressionError('Введено неправильное RPN выражение')
     return stack[0]
-
