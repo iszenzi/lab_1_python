@@ -1,3 +1,4 @@
+import re
 from src.constants import OPERATIONS
 from src.exceptions import (
     UnknownTokenError,
@@ -7,7 +8,28 @@ from src.exceptions import (
     IntegerNumbersError,
     InvalidTokenValueError
 )
-def tokenize(string: str) -> list[tuple[str, float | int | None]]:
+
+def token_type(part: str) -> tuple[str, int | float | None]:
+    """
+    Распределяет токены на конкретные виды
+    :param part: Часть строки, разбитая регулярное выражение
+    :return: Возвращает кортеж, где первый элемент это тип токена, второй элемент - значение токена
+    """
+    #Добавление токена целого числа
+    if part.isdigit():
+        return ("NUMBER", int(part))
+    #Добавление токена оператора
+    elif part in OPERATIONS:
+        return (part, None)
+    else:
+        try:
+            # Пробуем преобразовать в float и добавить токен вещественного числа
+            return ("NUMBER", float(part))
+        except ValueError:
+            # Если не число и не оператор - ошибка
+            raise UnknownTokenError(f'Неизвестный токен "{part}"')
+
+def tokenize2(string: str) -> list[tuple[str, float | int | None]]:
     """
     Разбивает строку на токены: числа и операторы
     Кладет полученные токены в список
@@ -18,34 +40,24 @@ def tokenize(string: str) -> list[tuple[str, float | int | None]]:
     :return: Возвращает список токенов
     """
     tokens: list[tuple[str, float | int | None]] = []
-    parts = str(string).split()
-    if not parts:
+    #Проверка на пустую строку
+    if not string.split():
         raise EmptyStringError('Введена пустая строка')
-    operations = OPERATIONS
-    for part in parts:
-
-        #Добавление токена вещественного числа
-        if part.count('.') == 1:
-            part_float = part.split('.')
-            """
-            lstrip удалит все + или - слева, если + или - будет один,т.е. число является унарным,
-            то оно сможет преобразоваться во float()/int(), но если знаков будет > чем 1,
-            то except выведет ошибку, так как float()/int() не преобразует число --5
-            """
-            if ''.join(part_float).lstrip('+-').isdigit():
-                tokens.append(('NUMBER', float(part)))
-        #Добавление токена целого числа
-        elif part.lstrip('+-').isdigit():
-            tokens.append(('NUMBER', int(part)))
-        #Добавление токена оператора
-        elif part in operations:
-            tokens.append((part, None))
-        else:
-            raise UnknownTokenError(f'Неизвестный токен "{part}"')
-    return tokens
-
-#def tokenize2(string: str) -> list[(str, float | int | None)]:
-
+    joined_string = "".join(string.split())
+    #Регулярное выражение, задающее токены
+    pattern = r'\s*([+\-]?\d+(?:\.\d+)?|//|\*\*|[%+\-*/])'
+    joined_tokens = "".join(re.findall(pattern, string))
+    #Преобразование токенов в конкретные виды
+    tokens = [token_type(token) for token in re.findall(pattern, string)]
+    #Проверка, что пользователь ввел корректные токены
+    if joined_tokens == joined_string:
+        return tokens
+    #Нахождение неизвестных токенов
+    else:
+        for i in joined_tokens:
+            joined_string = joined_string.replace(i, ' ')
+        invalid_token = joined_string
+        raise UnknownTokenError(f'Неизвестный токен "{invalid_token}"')
 
 def calculate(tokens: list[tuple[str, float | int | None]]) -> float | int:
     """

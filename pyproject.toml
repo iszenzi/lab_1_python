@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Сonsole calculator for python"
 requires-python = ">=3.12"
 dependencies = [
+    "mypy>=1.18.2",
     "pytest>=8.4.2",
+    "ruff>=0.14.1",
 ]
 
 [tool.mypy]

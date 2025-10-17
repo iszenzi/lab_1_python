@@ -1,5 +1,5 @@
 import pytest
-from src.calculator import calculate, tokenize
+from src.calculator import calculate, tokenize2
 from src.exceptions import (
     UnknownTokenError,
     EmptyStringError,
@@ -11,22 +11,22 @@ from src.exceptions import (
 
 
 def test_tokenize_float() -> None:
-    assert tokenize('   12.435  ') == [('NUMBER', 12.435)]
-    assert tokenize('1111111111.11111111111') == [('NUMBER', 1111111111.11111111111)]
+    assert tokenize2('   12.435  ') == [('NUMBER', 12.435)]
+    assert tokenize2('1111111111.11111111111') == [('NUMBER', 1111111111.11111111111)]
 
 def test_tokenize_int() -> None:
-    assert tokenize('3      82   5') == [('NUMBER', 3), ('NUMBER', 82), ('NUMBER', 5)]
+    assert tokenize2('3      82   5') == [('NUMBER', 3), ('NUMBER', 82), ('NUMBER', 5)]
 
 def test_tokenize_unary() -> None:
-    assert tokenize('-3 +5  -22 +1') == [('NUMBER', -3), ('NUMBER', 5), ('NUMBER', -22), ('NUMBER', 1)]
-    assert tokenize(' +3.14  -5.2 -13.3') == [('NUMBER', 3.14), ('NUMBER', -5.2), ('NUMBER', -13.3)]
+    assert tokenize2('-3 +5  -22 +1') == [('NUMBER', -3), ('NUMBER', 5), ('NUMBER', -22), ('NUMBER', 1)]
+    assert tokenize2(' +3.14  -5.2 -13.3') == [('NUMBER', 3.14), ('NUMBER', -5.2), ('NUMBER', -13.3)]
 
 def test_tokenize_operations() -> None:
-    assert tokenize(' +  -  /   // %  *') == [('+', None), ('-', None), ('/', None), ('//', None), ('%', None), ('*', None)]
+    assert tokenize2(' +  -  /   // %  *') == [('+', None), ('-', None), ('/', None), ('//', None), ('%', None), ('*', None)]
 
 def test_tokenize_expression() -> None:
-    assert tokenize(' 3 4 +') == [('NUMBER', 3), ('NUMBER', 4), ('+', None)]
-    assert tokenize('2  5  * 2 +') == [('NUMBER', 2), ('NUMBER', 5), ('*', None), ('NUMBER', 2), ('+', None)]
+    assert tokenize2(' 3 4 +') == [('NUMBER', 3), ('NUMBER', 4), ('+', None)]
+    assert tokenize2('2  5  * 2 +') == [('NUMBER', 2), ('NUMBER', 5), ('*', None), ('NUMBER', 2), ('+', None)]
 
 def test_calculate_integer_operations() -> None:
     assert calculate([('NUMBER', 10), ('NUMBER', 2), ('//', None)]) == 5
@@ -44,13 +44,13 @@ def test_caluclate_non_integer_operations() -> None:
 
 def test_tokenize_empty_srting_raises() -> None:
     with pytest.raises(EmptyStringError) as exc_info:
-        tokenize('')
+        tokenize2('')
     assert 'Введена пустая строка' in str(exc_info.value)
     assert exc_info.type is EmptyStringError
 
 def test_tokenize_unknown_token_raises() -> None:
     with pytest.raises(UnknownTokenError) as exc_info:
-        tokenize(' :(  ')
+        tokenize2(' :(  ')
     assert 'Неизвестный токен ":("' in str(exc_info.value)
     assert exc_info.type is UnknownTokenError
 
